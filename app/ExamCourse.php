@@ -12,7 +12,7 @@ class ExamCourse extends Model
     ];
 
     public function degrees(){
-    	return $this->belongsTo('App\Degree','exam_id');
+    	return $this->hasMany('App\Degree','exam_id');
     }
     public function courses(){
     	return $this->belongsTo('App\Course','course_id');

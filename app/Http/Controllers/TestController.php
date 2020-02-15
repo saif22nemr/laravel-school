@@ -10,17 +10,28 @@ use App\Level;
 use App\Schedule;
 use App\ScheduleDate;
 use App\Semester;
+use App\SemesterLevelStudent;
 use App\Student;
 use App\Teacher;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class TestController extends Controller
 {
     public function test(){
-      
-      return $val;
+        
+        //$val =  SemesterLevelStudent::where('level_id',6)->where('semester_id',6)->students;
+        $val = SemesterLevelStudent::where('semester_id',6)->where('level_id',4)->with('students')->get()->pluck('students');
+
+        //this way for get student by query directly.
+        // $val = DB::select('select username,id,email,fullname,address,image birthday from 
+        //     student_level_semester sls inner join users st on (st.id = sls.student_id and st.userGroup = 3)
+        //     where level_id = 4 and semester_id = 6 
+        //     ');
+
+        return $val;
     }
     private function defineGroupUser(){
     	$users = User::all();

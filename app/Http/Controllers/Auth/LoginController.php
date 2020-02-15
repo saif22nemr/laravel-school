@@ -3,8 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Log;
 use App\Providers\RouteServiceProvider;
+use App\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+
 
 class LoginController extends Controller
 {
@@ -36,5 +42,36 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt(['email'=>$request->email,'password'=>$request->password,'userGroup'=>1])) {
+            // Authentication passed...
+            $user = Auth::user();
+            do{
+                $token = Str::random(80);
+                $check = User::where('api_token',$token)->first();
+                if(!isset($check->id))
+                    break;
+            }while (true);
+            $user->api_token = $token;
+            session(['apiToken'=>$user->api_token]);
+            $user->save();
+            Log::create([
+                'user_id'   => $user->id,
+                'admin_side'=> 1,
+            ]);
+            return redirect()->intended('home');
+        }
+        return response()->json([
+            'error' => 'Invalid Authentication'
+        ],402);
+    }
+    public function logout(){
+        session()->forget('apiToken');
+        Auth::logout();
+        return view('welcome');
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Semester;
 use App\Course;
 use App\Http\Controllers\ApiController;
 use App\Semester;
+use App\SemesterCourseTeacher;
 use App\Teacher;
 use Illuminate\Http\Request;
 
@@ -19,7 +20,8 @@ class SemesterTeacherCourseController extends ApiController
     {
         if(!$semester->teachers->contains($teacher))
             return $this->errorResponse('The semester not contain this teacher',422);
-        $courses = $teacher->courses()->whereHas('levels')->with('levels')->get();
+        //$courses = $teacher->courses()->whereHas('levels')->with('levels')->get();
+        $courses = SemesterCourseTeacher::where('semester_id',$semester->id)->where('teacher_id',$teacher->id)->with('courses')->get()->pluck('courses');
         return $this->showAll($courses);
     }
 

@@ -12,8 +12,9 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
+	$val = 'from controller';
+    return view('admin.dashboard',compact('val'));
+})->name('/');
 Route::get('test', 'TestController@test');
 
 Auth::routes(['register' => false]);

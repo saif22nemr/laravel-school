@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Semester;
 use App\Http\Controllers\ApiController;
 use App\Level;
 use App\Semester;
+use App\SemesterLevelStudent;
 use App\Student;
 use Illuminate\Http\Request;
 
@@ -17,7 +18,7 @@ class SemesterLevelStudentController extends ApiController
      */
     public function index(Semester $semester, Level $level)
     {
-        $students = $semester->levels->where('id',$level->id)->first()->students;
+        $students = SemesterLevelStudent::where('semester_id',$semester->id)->where('level_id',$level->id)->with('students')->get()->pluck('students');
         return $this->showAll($students);
     }
 

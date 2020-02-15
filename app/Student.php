@@ -34,10 +34,13 @@ class Student extends User
     return $this->hasMany('App\Log','user_id');
   }
   
-  public function levels(){
+    public function levels(){
         return $this->belongsToMany('App\Level','student_level_semester','student_id','level_id')->withTimestamps();
     }
     public function semesters(){
         return $this->belongsToMany('App\Semester','student_level_semester','student_id','semester_id')->withTimestamps();
+    }
+    public function degrees(){
+        return $this->hasMany('App\ExamDegree','student_id');
     }
 }

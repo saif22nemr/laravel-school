@@ -13,10 +13,13 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware(['auth:api'])->get('/user', function () {
+    return view('admin.dashboard');
 });
 Route::get('test','TestController@test');
+
+//All route that need authentcation
+//Route::group();
 
 //Academic Year
 Route::resource('academic_year','AcademicYear\AcademicYearController')->except(['create', 'edit']);
@@ -54,6 +57,7 @@ Route::resource('semester.level.student','Semester\SemesterLevelStudentControlle
 Route::resource('semester.schedule','Semester\SemesterScheduleController')->only(['show','index']);
 Route::resource('semester.course.teacher','Semester\SemesterCourseTeacherController')->only(['show','index']);
 Route::resource('semester.course.schedule','Semester\SemesterCourseScheduleController')->only(['show','index']);
+Route::resource('semester.exam','Semester\SemesterExamController')->only(['index']);
 
 //Schedule
 
@@ -62,6 +66,10 @@ Route::resource('schedule','Schedule\ScheduleController')->only(['index','show']
 //Exam
 
 Route::resource('exam','Exam\ExamController')->only(['index','show']);
+Route::resource('exam.semester','Exam\ExamSemesterController')->only(['index']);
+Route::resource('exam.course','Exam\ExamCourseController')->only(['index']);
+Route::resource('exam.detail','Exam\ExamDetailController')->only(['index']);
+Route::resource('exam.course.grade','Exam\ExamCourseDegreeController')->only(['index','store']);
 
 //Employee
 

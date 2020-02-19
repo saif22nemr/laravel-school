@@ -46,7 +46,8 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
-
+        if(!isset($request->email) or !isset($request->password))
+            return view('auth.login');
         if (Auth::attempt(['email'=>$request->email,'password'=>$request->password,'userGroup'=>1])) {
             // Authentication passed...
             $user = Auth::user();
@@ -57,21 +58,25 @@ class LoginController extends Controller
                     break;
             }while (true);
             $user->api_token = $token;
-            session(['apiToken'=>$user->api_token]);
+            //session(['apiToken'=>$user->api_token]);
             $user->save();
             Log::create([
                 'user_id'   => $user->id,
                 'admin_side'=> 1,
             ]);
+            if(isset($request->admin))
+                return redirect()->intended('admin');
             return redirect()->intended('home');
         }
-        return response()->json([
-            'error' => 'Invalid Authentication'
-        ],402);
+        return view('auth.login');
+        // return response()->json([
+        //     'error' => 'Invalid Authentication',
+        //     'request' => $request->email
+        // ],402);
     }
     public function logout(){
-        session()->forget('apiToken');
+        
         Auth::logout();
-        return view('welcome');
+        return view('auth.login');
     }
 }

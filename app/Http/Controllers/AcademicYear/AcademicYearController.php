@@ -36,8 +36,12 @@ class AcademicYearController extends ApiController
         $check = AcademicYear::where('status',1)->first();
         if(isset($check->id))
             return $this->errorResponse('There academic year opened, you can\'t create new one while there another opened',422);
-        $academicYear = AcademicYear::create($request->only(['title']));
-        return $this->showOne($academicYear);
+        $academicYear = AcademicYear::create(['title' => $request['title']]);
+        if(isset($academicYear->id))
+            return $this->showOne($academicYear);
+        else // for make sure it created ..
+            return $this->errorResponse('There something wrong, try again!',422);
+
     }
 
     /**

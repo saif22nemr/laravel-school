@@ -2,35 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Admin;
-use App\Course;
 use App\Exam;
-use App\Fullyear;
+use App\User;
+use App\Admin;
 use App\Level;
-use App\Schedule;
-use App\ScheduleDate;
-use App\Semester;
-use App\SemesterLevelStudent;
+use App\Course;
 use App\Student;
 use App\Teacher;
-use App\User;
+use App\Fullyear;
+use App\Schedule;
+use App\Semester;
+use App\AcademicYear;
+use App\ScheduleDate;
 use Illuminate\Http\Request;
+use App\SemesterLevelStudent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class TestController extends Controller
 {
     public function test(){
-        
-        //$val =  SemesterLevelStudent::where('level_id',6)->where('semester_id',6)->students;
-        $val = SemesterLevelStudent::where('semester_id',6)->where('level_id',4)->with('students')->get()->pluck('students');
-
-        //this way for get student by query directly.
-        // $val = DB::select('select username,id,email,fullname,address,image birthday from 
-        //     student_level_semester sls inner join users st on (st.id = sls.student_id and st.userGroup = 3)
-        //     where level_id = 4 and semester_id = 6 
-        //     ');
-
+        $date = '2020-03-31';
+        //$val = DB::select("select a.id as academic_id, a.title as academic_title,s.title,s.start_date,s.end_date from academic_year a left join semesters s on( academic_year_id = a.id) order by start_date");
+        $val = 'home';
         return $val;
     }
     private function defineGroupUser(){

@@ -8,6 +8,7 @@ use App\Student;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class StudentController extends ApiController
 {
@@ -31,17 +32,21 @@ class StudentController extends ApiController
      */
     public function store(Request $request)
     {
+        
+      //var_dump($request->all());
+
         $request->validate([
-            'username' => 'required|min:2|max:150',
+            'username' => 'required|min:2|max:150|unique:users',
             'fullname' => 'required|min:2|max:150',
             'active' => 'boolean',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:users',
             'image' => 'required|image',
             'birthday' => 'required|date',
             'phone' => 'array',
             'address' => 'required|min:2',
             'password' => 'required|confirmed|min:6',
         ]);
+
         $checkPhone = false;
         if(isset($request->phone)){
           foreach ($request->phone as $index => $value) {
@@ -53,9 +58,10 @@ class StudentController extends ApiController
           $checkPhone = true;
         }
         
-        $data = $request->only(['username','fullname','email','address','active','birthday', 'image']);
+        $data = $request->only(['username','fullname','email','address','active','birthday']);
         $data['password'] = Hash::make($request->password);
         $data['userGroup'] = 3; //for student
+        $data['image'] = $request->image->store('');
         $newUser = User::create($data);
         if($checkPhone == true){
           foreach($request->phone as $index => $value){
@@ -146,7 +152,9 @@ class StudentController extends ApiController
      */
     public function destroy(Student $student)
     {
+
         $student->delete();
+        Storage::disk('image')->delete($student->image);
         return $this->showOne($student);
     }
 }

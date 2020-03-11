@@ -14,17 +14,16 @@ use Illuminate\Http\Request;
 */
 
 Route::middleware(['auth:api'])->group(function(){
-	Route::post('/user', function () {
+	Route::get('/user', function () {
 	    return response()->json(['status'=>'success'],200);
-	});
+	})->name('user');
 	Route::resource('academic_year','AcademicYear\AcademicYearController')->except(['create', 'edit']);
-	Route::resource('academic_year.semester','AcademicYear\AcademicYearSemesterController')->except(['create', 'edit']);
+
 	//All route that need authentcation
 	//Route::group();
 
 	//Academic Year
 
-	Route::resource('academic_year.semester','AcademicYear\AcademicYearSemesterController')->except(['create', 'edit']);
 
 	//Teacher
 

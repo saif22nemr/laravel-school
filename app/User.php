@@ -16,7 +16,7 @@ class User extends Authenticatable
      *  userGroup: [
             1 : admin,
             2 : teacher,
-            3 : student, 
+            3 : student,
             4 : parent,
         ]
      * @var array
@@ -53,7 +53,10 @@ class User extends Authenticatable
     public function degrees(){
       return $this->hasMany('App\Degree','student_id');
     }
-    
-    
+    public function teacher(){
+        return $this->hasOne('App\Teacher');
+    }
+
+
 
 }

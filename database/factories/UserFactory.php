@@ -1,6 +1,7 @@
 <?php
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
+use App\Log;
 use App\Exam;
 use App\Room;
 use App\User;
@@ -17,7 +18,6 @@ use App\AcademicYear;
 use App\ScheduleDate;
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;
-use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,7 +68,7 @@ $factory->define(Admin::class, function (Faker $faker) {
     $titleJobs = ['Super Admin','Register', 'Stuff Manager','Workers Manager'];
     $day = $faker->numberBetween(1,28);
     $month = $faker->numberBetween(1,12);
-    $year = $faker->numberBetween(1980,2000s);
+    $year = $faker->numberBetween(1980,2000);
     $fakeDate = ''.$year.'-'.$month.'-'.$day;
     //$user = User::where('userGroup','>=',2)->get()->random()->id;
     return [
@@ -102,7 +102,7 @@ $factory->define(AcademicYear::class, function (Faker $faker) {
   $year = $faker->numberBetween(2018,2019);
   $fakeDate = ''.$year.'-'.$month.'-'.$day;
     return [
-        'title' => $fake->unique()->userName,
+        'title' => $faker->unique()->userName,
     ];
 });
 
@@ -112,9 +112,18 @@ $factory->define(Semester::class, function (Faker $faker) {
   $year = $faker->numberBetween(2018,2019);
   $fakeDate = ''.$year.'-'.$month.'-'.$day;
     return [
-        'title' => $fake->unique()->userName,
+        'title' => $faker->unique()->userName,
         'start_date' => $fakeDate,
         'end_date' => $fakeDate,
-        'type'   => $fake->randomElement([1,2]),
+        'type'   => $faker->randomElement([1,2]),
     ];
 });
+
+$factory->define(Course::class, function (Faker $faker) {
+    return [
+        'title' => $faker->unique()->name,
+        'description' => $faker->paragraph(2),
+        'level_id' => Level::all()->random()->id,
+    ];
+});
+

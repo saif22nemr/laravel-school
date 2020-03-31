@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,14 +37,15 @@ Route::middleware(['auth:api'])->group(function(){
 
 	//Course
 
-	Route::resource('course','Course\CourseController')->only(['show','index']);
+	Route::resource('course','Course\CourseController')->except(['create','edit']);
 	Route::resource('course.level','Course\CourseLevelController')->only(['index']);
 	Route::resource('course.semester.teacher','Course\CourseSemesterTeacherController')->only(['index']);
 	Route::resource('course.semester.student','Course\CourseSemesterStudentController')->only(['index']);
 
 	//Level
 
-	Route::resource('level','Level\LevelController')->except(['create','edit']);
+    Route::resource('level','Level\LevelController')->except(['create','edit']);
+    Route::get('levels/courses','Level\LevelController@getLevelsCourses')->name('levels.courses');
 	Route::resource('level.course','Level\LevelCourseController')->except(['create','edit']);
 
 	//Semester
@@ -80,7 +82,18 @@ Route::middleware(['auth:api'])->group(function(){
 	*/
 	Route::resource('admin','Admin\AdminController')->except(['create','edit']);
 	Route::resource('admin.semester.exam','Admin\AdminSemesterExamController')->except(['create','edit']);
-	Route::resource('admin.semester.schedule','Admin\AdminSemesterScheduleController')->except(['create','edit']);
+    Route::resource('admin.semester.schedule','Admin\AdminSemesterScheduleController')->except(['create','edit']);
+
+    //Logs
+
+    Route::resource('log','Log\LogController')->only(['index','destroy']);
+    Route::get('log/delete_by_time','Log\LogController@destroyByTime')->name('log.destroyAll');//->name('deleteByTime');
+
+    //Setting
+
+    Route::get('get_available_academic_year','Setting\SchoolManagerController@getAvailableAcademicYear')->name('getAvailableAcademicYear');
+    Route::get('current_academic_year','Setting\SchoolManagerController@getCurrentAcademicYear')->name('currentAcademicYear.show');
+    Route::post('current_academic_year/{academicYear}/{semester}','Setting\SchoolManagerController@storeCurrentAcademicYear')->name('currentAcademicYear.store');
 
 
 });

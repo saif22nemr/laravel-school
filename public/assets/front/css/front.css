@@ -1,0 +1,253 @@
+/*The End Style*/
+
+/* Start Global Style */
+table a{
+	color:#000;
+}
+table a:hover{
+	color:#5a5a5a;
+}
+table a:visit{
+	color:#000;
+}
+label{
+    text-transform: capitalize;
+}
+.alert-message .message{
+	width: 98%;
+    margin: 10px 1%;
+}
+.display-none{
+	display: none
+}
+
+/* End Global Style */
+
+/* Start App Style */
+.nav-pills > li > a{
+
+    font-size: 1rem;
+    letter-spacing: 1px;
+}
+.nav-treeview li a{
+    padding: 4px;
+    padding-left:22px !important;
+}
+.nav-treeview li a p{
+    font-size: .9rem !important;
+}
+.nav-treeview>.nav-item>.nav-link>.nav-icon{
+    font-size:.9rem;
+}
+
+/* End App Style */
+/* Start Form Style */
+#form-add .password-generator > input{
+    width:80% !important;
+    float:left;
+}
+#form-add .password-generator > button{
+    float:right;
+}
+/* End Form Style */
+/*Start Table List Style*/
+form.form-list{
+	padding: 0;
+	margin:0;
+}
+.form-list .control a{
+    font-size: 12px !important;
+    padding:6px 12px;
+    margin: 0 3px;
+}
+.button-control{
+	display: inline-block;
+	float:right;
+}
+.button-control > a,
+.button-control > button{
+	padding:10px 15px;
+	font-size:0.70rem !important;
+	border:none;
+	color:#fff;
+	border-radius:5px;
+}
+td a.edit{
+	padding:9px 14px;
+	font-size:0.70rem !important;
+	color:#fff;
+	border-radius:5px;
+}
+.button-control > a,
+.edit{
+	background-color:#1e91cf;
+	border:1px solid #18628a;
+	/* margin-left:5px; */
+}
+.button-control > button{
+	background-color:#e3503e;
+	border:1px solid #b53f31;
+}
+.pages{
+    max-width: 241px;
+    border-bottom:2px solid #CCC;
+    padding-bottom: 10px;
+    margin:20px auto;
+    border-radius: 10px;
+    justify-items: center;
+}
+.pages:hover{
+    border-bottom-color: #5a5a5a;
+}
+.pages > button{
+    background-color: #CCC;
+    border: none;
+    border-radius: 5px;
+    padding:5px 15px;
+    margin:5px;
+}
+.error-row{
+    background-color: #bf1400c2;
+    color: #FFF;
+}
+.error-row:hover{
+    background-color: #981000c2 !important;
+    color: #FFF !important;
+}
+#empty-message{
+    display: none;;
+}
+#wait-message{
+
+    background-color:rgba(119,119,119,0.6);
+    border: none;
+    box-shadow: 1px 1px 15px #888;
+}
+/* Search Style */
+.search-form{
+    margin-bottom:20px;
+}
+.search-form.front{
+    visibility: hidden;
+}
+.search-form input,
+.search-form select{
+    font-size: 14px;
+    padding: 5px 10px;;
+    border-radius: 5px;
+    background-color: #FFF;
+}
+.search-form input{
+    border: 1px solid #a9a9a9;
+    margin-left:10px;
+    width: 53%;
+}
+/*End Table List Style*/
+
+/*Start Style Form*/
+.add-form{
+	width:100%;
+}
+.add-form .card-footer input[type=submit]{
+	width:200px;
+	margin:auto;
+}
+.another-input{
+	padding:10px 5px;
+	border:1px solid #CCC;
+	border-radius:5px;
+	margin:10px 0;
+}
+.another-input .input-title{
+	text-align: center;
+	font-family: Arial;
+	text-transform: capitalize;
+}
+.add-form input[type=button]{
+	width:200px;
+}
+.add-form .alert-danger{
+	padding:5px 10px;
+	margin:5px 0;
+}
+.add-form .level-part select{
+    width: 80%;
+    float: left;
+}
+.add-form .level-part > button {
+    width: 18%;
+    float:right;
+}
+.add-form .level-control{
+    /* overflow: hidden; */
+    margin: 60px 0;
+    clear:both;
+    padding:20px 30px;
+
+}
+.btn-to-right{
+    padding: 5px 30px;
+    margin:10px 0;
+}
+.teacher-course-form .another-input{
+    padding:20px ;
+}
+.teacher-course-form .another-input .form-body .row{
+    margin:10px 0;
+}
+/*End Style Form*/
+
+
+/* Start Student */
+.student-list .card-body{
+    overflow-x: auto;
+}
+/* End Student */
+
+/* Start Style of Navgator */
+.navigator{
+    /* position: fixed;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left: 0; */
+    display: none;
+    z-index:2000;
+    transition: 1s;
+}
+.navigator .body {
+    width: 350px;
+    padding: 10px 10px;
+    position: fixed;
+    z-index:2000;
+    top: 20px;
+    left:-400px;
+    color: #FFF;
+    opacity: 0.9;
+    border-radius: 10px;
+    border-top-left-radius: 0;;
+    transition: 1s;
+}
+.error-color{
+    background-color: #d63031;
+}
+.success-color{
+    background-color: #18628a;
+}
+.navigator .body .content{
+    display: inline-block;
+    margin-right:1%;
+    width: 93%;
+    float: left;
+}
+.navigator .body .close-button{
+    width: 6%;
+    height: 20px;
+    color: #FFF;
+    float: right;
+}
+.navigator .body .close-button .close{
+    text-shadow: 1px 1px 10px #FFF;
+    font-size: 16px;
+}
+/* End Style of Navgator */

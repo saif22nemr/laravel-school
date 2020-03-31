@@ -25,40 +25,41 @@ class DatabaseSeeder extends Seeder
     {
         DB::statement('SET FOREIGN_KEY_CHECKS = 0'); // for disable foreign key for some time
 
-        User::truncate();
-        Teacher::truncate();
-        Semester::truncate();
-        AcademicYear::truncate();
-        Level::truncate();
-        Course::truncate();
-        Phone::truncate();
-        Schedule::truncate();
-        ScheduleDate::truncate();
+        // User::truncate();
+        // Teacher::truncate();
+        // Semester::truncate();
+        // AcademicYear::truncate();
+        // Level::truncate();
+        // Course::truncate();
+        // Phone::truncate();
+        // Schedule::truncate();
+        // ScheduleDate::truncate();
 
-        //for not sending email createing fake data
-        User::flushEventListeners();
-        Teacher::flushEventListeners();
-        Semester::flushEventListeners();
-        AcademicYear::flushEventListeners();
-        Level::flushEventListeners();
-        Course::flushEventListeners();
-        Phone::flushEventListeners();
-        Schedule::flushEventListeners();
-        ScheduleDate::flushEventListeners();
+        // //for not sending email createing fake data
+        // User::flushEventListeners();
+        // Teacher::flushEventListeners();
+        // Semester::flushEventListeners();
+        // AcademicYear::flushEventListeners();
+        // Level::flushEventListeners();
+        // Course::flushEventListeners();
+        // Phone::flushEventListeners();
+        // Schedule::flushEventListeners();
+        // ScheduleDate::flushEventListeners();
 
-        DB::table('exam_student_degree')->truncate(); //used when the table not have model
-        DB::table('student_level_semester')->truncate();
-        DB::table('teacher_course_semester')->truncate();
+        // DB::table('exam_student_degree')->truncate(); //used when the table not have model
+        // DB::table('student_level_semester')->truncate();
+        // DB::table('teacher_course_semester')->truncate();
 
-        factory(User::class,2000)->create()->each(function($user) {
-            if($user->userGroup == 2){
-                $user->teacher()->save(factory(Teacher::class)->make());
-            }
-            elseif($user->userGroup == 1){
-                $user->teacher()->save(factory(Admin::class)->make());
-            }
-        });
-        factory(Log::class,1500)->create();
+        // factory(User::class,2000)->create()->each(function($user) {
+        //     if($user->userGroup == 2){
+        //         $user->teacher()->save(factory(Teacher::class)->make());
+        //     }
+        //     elseif($user->userGroup == 1){
+        //         $user->teacher()->save(factory(Admin::class)->make());
+        //     }
+        // });
+        //factory(Log::class,1500)->create();
+        factory(Course::class,1500)->create();
 
     }
 }

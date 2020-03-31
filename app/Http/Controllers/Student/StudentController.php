@@ -17,13 +17,49 @@ class StudentController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $students = Student::with('phones')->get();
+        //return $this->errorResponse($request->all(),422);
+        $request->validate([
+            'searchby' => 'string|in:id,fullname,username,address,year_of_birthday,email',
+            'sortby'   => 'string|in:id,fullname,username,address,birthday,email,created_at',
+            'orderby'  => 'string|in:desc,asc'
+        ]);
+        //$students = Student::where('userGroup',3);
+        //filter with search
+        if(isset($request->search) and $request->search != '' and isset($request->searchby)){
+            // if(!isset($request->searchby)){
+            //     return $this->errorResponse('Invalid Search',422);
+            // }
+            if($request->searchby == 'year_of_birthday'){
+                if(strlen($request->search) != 4 or !is_numeric($request->search))
+                    return $this->errorResponse('Invalid year input',422);
+                $students = Student::where('birthday','like', '%'.$request->search.'%');
+            }
+            else if($request->searchby == 'id'){
+                //check if number
+                if(!is_numeric($request->search))
+                    return $this->errorResponse('The search field should be integer',422);
+                //return $this->successResponse($request->all());
+                $students = Student::where('id',$request->search);
+            }
+            else{
+                $students = Student::where($request->searchby, 'like', '%'.$request->search.'%');
+            }
+        }else
+            $students = Student::where('userGroup',3);
+        //filter with sort
+        if(isset($request->sortby)){
+            $order = isset($request->orderby) ? $request->orderby : 'desc';
+            $students = $students->orderBy($request->sortby , $order);
+        }else{
+            $students = $students->orderby('created_at','desc');
+        }
+        $students = $students->get();
         return $this->showAll($students);
     }
 
-   
+
     /**
      * Store a newly created resource in storage.
      *
@@ -32,7 +68,7 @@ class StudentController extends ApiController
      */
     public function store(Request $request)
     {
-        
+
       //var_dump($request->all());
 
         $request->validate([
@@ -57,7 +93,7 @@ class StudentController extends ApiController
           }
           $checkPhone = true;
         }
-        
+
         $data = $request->only(['username','fullname','email','address','active','birthday']);
         $data['password'] = Hash::make($request->password);
         $data['userGroup'] = 3; //for student
@@ -65,6 +101,7 @@ class StudentController extends ApiController
         $newUser = User::create($data);
         if($checkPhone == true){
           foreach($request->phone as $index => $value){
+
             Phone::create(['phoneNumber'=>$value,'user_id'=>$newUser->id]);
           }
         }
@@ -96,48 +133,57 @@ class StudentController extends ApiController
     {
         $request->validate([
           'fullname' => 'min:4|max:30',
-          'username' => 'min:4|max:20|unique:users',
-          'email' => 'email|unique:users',
+          'username' => 'min:4|max:20',
+          'email' => 'email',
           'address' => 'min:6',
           'active' => 'boolean',
           'birthday' => 'date',
-          'password' => 'min:6|confirmed',
+          'password' => 'confirmed',
           'phone' => 'array',
           'image' => 'image',
         ]);
-        $checkPhone = false;
+        //check unique of username, email
+        $check = User::where('id','!=',$student->id);
+        $checkUsername = $check->where('username', $request->username)->first();
+        if(isset($checkUsername->id))
+            return $this->errorResponse('The username must be unique',422);
+        $checkEmail = $check->where('email',$request->email)->first();
+        if(isset($checkEmail->id))
+            return $this->errorResponse('The email must be unique',422);
+        //check phone
         if(isset($request->phone)){
           foreach ($request->phone as $index => $value) {
             if(!preg_match("/(01)[0-9]{9}/",$value,$match) or strlen($value) != 11)
               return $this->errorResponse(['phone' => 'The Phone must be 11 integer and valid format'],422);
           }
-          $checkPhone = true;
         }
-        
-        $data = $request->only(['username','fullname','email','address','active','birthday', 'image']);
-        if(isset($request->password))
+
+        $data = $request->only(['username','fullname','email','address','active','birthday']);
+        //check if there password updated or not and check count of character
+        if(isset($request->password)){
+          if(strlen($request->password) < 8 and strlen($request->password) != 0)
+            return $this->errorResponse('The password must be min 8 charcter',422);
           $data['password'] = Hash::make($request->password);
+        }
         $user = $student;
+        if(isset($request->image))
+            $user->image = $request->image->store('');
         if(count($data)  != 0){
             $user->fill($data);
             $user->save();
         }
-        if($checkPhone == true){
+        if(isset($request->phone)){
           $phones = $user->phones;
+          //delete all phones of this user
+          Phone::where('user_id',$student->id)->delete();
           //loop for add new phones
           foreach($request->phone as $index => $value){
-            $phone = Phone::where('phoneNumber',$value)->first();
-            if(isset($phone->phoneNumber)) continue;
             Phone::create([
               'phoneNumber'=>$value,
               'user_id' => $user->id,
             ]);
           }
-          //loop for delete phone not exist
-          foreach ($phones as $index => $phone) {
-            if(!in_array($phone->phoneNumber , $request->phone))
-              Phone::where('phoneNumber',$phone->phoneNumber)->delete();
-          }
+
         }
         //$newUser->with('phones')->first();
         $student = $student->where('id',$student->id)->with('phones')->first();

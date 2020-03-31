@@ -21,9 +21,10 @@ class Employee extends Model
     public function phones(){
       return $this->hasMany('App\Phone','user_id','user_id');
     }
-    
+
     public function isTeacher(Teacher $teacher){
       return $teacher->admin == 0? true : false;
     }
+
 
 }

@@ -21,7 +21,8 @@ trait ApiResponse
   }
   protected function showAll(Collection $collection, $code=200, $prePage = 20, $additionalData = null){
     //$collection = $this->sortData($collection);
-    $collection = $this->paginate($collection, $prePage);
+    if($prePage > 0)
+        $collection = $this->paginate($collection, $prePage);
     if($additionalData == null)
         return response()->json(['data' => $collection ],$code);
     else

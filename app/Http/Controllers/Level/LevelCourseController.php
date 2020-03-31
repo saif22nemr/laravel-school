@@ -70,14 +70,15 @@ class LevelCourseController extends ApiController
             'title' => 'min:2|max:150|string',
             'description' => 'min:2|string'
         ]);
-        if(!$level->courses->contains($course))
-            return $this->errorResponse('The level not contain this course',422);
+        // if(!$level->courses->contains($course))
+        //     return $this->errorResponse('The level not contain this course',422);
         $check = Course::where('id','!=',$course->id)->where('level_id',$level->id)->where('title',$request->title)->first();
         if(isset($check->id))
             return $this->errorResponse('The level is contain samilar course',422);
         $data = $request->only([
             'title' , 'description'
         ]);
+        $data['level_id'] = $level->id;
         $course->fill($data);
         $course->save();
         return $this->showOne($course);

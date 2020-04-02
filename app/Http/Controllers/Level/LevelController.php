@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Level;
 
 use App\Level;
+use App\Setting;
+use App\Semester;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\ApiController;
+use Illuminate\Database\Eloquent\Builder;
 
 class LevelController extends ApiController
 {
@@ -115,9 +118,24 @@ class LevelController extends ApiController
         $level->delete();
         return $this->showOne($level);
     }
+    /**
+     *
+     * Method: [getLevelsCourses] => to get all levels with his courses;
+     *
+    */
     public function getLevelsCourses(){
-        //$all = Level::with('courses')->leftJoin('courses','courses.level_id','levels.id')->select('levels.*')->get();
-        $all = Level::with('courses')->get();
+
+        //check if exist current semester
+        $semesterid = Setting::where('title','current_semester')->first()->value;
+        if(!isset($semesterid) or !is_numeric($semesterid))
+            return $this->errorResponse('You should choose semester and academic year', 422);
+        $all = Level::with(['courses' => function( $query) use($semesterid){
+            $query->with(['teachers' => function($teacher) use($semesterid){
+                $teacher->whereHas('semesters', function($check) use($semesterid){
+                    $check->where('id',$semesterid);
+                });
+            }]);
+        }])->get();
         //$all = Level::all();
         return $this->showAll($all);
     }

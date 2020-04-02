@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Teacher;
 
 use App\User;
 use App\Phone;
+use App\Course;
+use App\Setting;
 use App\Teacher;
 use App\Employee;
+use App\Semester;
+use App\AcademicYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -235,5 +239,50 @@ class TeacherController extends ApiController
         if($teacher->info->image != null or $teacher->info->image == 'img.png')
             Storage::disk('image')->delete($teacher->info->image);
         return $this->showOne($teacher);
+    }
+    /**
+     *              Register courses to teacher with semester
+     * This method to store or update teacher and courses and semester too
+     * table : teacher_course_semester
+     *
+     *
+    */
+
+    public function storeCourseToTeacher(Request $request){
+        //return $this->successResponse($request->all());
+        //check if exist current academic year and semester in database
+        $check = Setting::where('title', 'current_academic_year')->first();
+        if(!isset($check->id) or !is_numeric($check->value) or $check->value <= 0){
+            return $this->errorResponse('There no current academic year',404);
+        }else{
+            $academicYear = AcademicYear::where('id', $check->value)->first();
+            if(!isset($academicYear->id))
+                return $this->errorResponse('There no current academic year',404);
+        }
+        $check = Setting::where('title', 'current_semester')->first();
+        if(!isset($check->id) or !is_numeric($check->value) or $check->value <= 0){
+            return $this->errorResponse('There no current academic year',404);
+        }else{
+            $semester = Semester::where('id', $check->value)->first();
+            if(!isset($semester->id))
+                return $this->errorResponse('There no current academic year',404);
+        }
+        $count = 0;
+        foreach ($request->all() as $key => $value) {
+            $name = explode('_',$key);
+            //structure : key= [teacher 4] , value : 6
+            if(count($name) != 2 or $name[0] != 'teacher' or !is_numeric($name[1]) or $name[1] <= 0 or !is_numeric($value))
+                continue;
+            //check if this teacher id is exist in database
+            $course = Course::where('id', $name[1])->first();
+            $teacher = Teacher::where('id', $value)->first();
+            if(isset($course->id)){
+                if(isset($teacher->id)){
+                    $semester->courses()->detach($course->id);
+                    $semester->teachers()->attach($teacher->id, ['course_id'=>$course->id]);
+                }
+            }
+        }
+        return $this->successResponse('Successfull register courses and teacher');
     }
 }

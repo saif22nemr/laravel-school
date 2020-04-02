@@ -7,7 +7,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">Store Courses And Teacher Of Academic Year</h1>
+            <h1 class="m-0 text-dark">Store Courses And Teacher To Academic Year</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -25,30 +25,35 @@
   <div class="container-fluid">
     <div class="card add-form">
       <div class="card-header">
-        <h3 class="card-title">@if(isset($academic)) Edit Academic Year @else New Academic Year @endif</h3>
+        <h3 class="card-title">Adding Courses To Teachers</h3>
       </div>
       <!-- /.card-header -->
       <!-- form start -->
-      <form id="form-add" role="form"  enctype="multipart/form-data">
-        @csrf
+
+
         <div class="card-body teacher-course-form">
-          <div class="content-message">
+            <div class="academic-title">
 
-          </div>
-        <div class="form-body">
+            </div>
+            <form id="form-add" role="form"  enctype="multipart/form-data">
+            @csrf
+            <div class="content-message">
 
-        </div>
+            </div>
+            <div class="form-body">
+                <h5 class="alert alert-info text-center">Wait To Load ...</h5>
+            </div>
 
 
 
-
+                <div class="card-footer text-center">
+                <input type="submit" class="btn btn-primary text-center" value="Save">
+                </div>
+            </form>
         </div>
         <!-- /.card-body -->
 
-        <div class="card-footer text-center">
-          <input type="submit" class="btn btn-primary text-center" @if(isset($academic)) value="Save Updated" @else value="Add New" @endif>
-        </div>
-      </form>
+
     </div>
   </div>
 </div>
@@ -118,26 +123,55 @@
             thisTag.css("display", "none");
         }, time);
     }
+    //check if there current semester and academic year
     $.ajax({
+        url: "{{route('currentAcademicYear.show')}}",
+        method: 'get',
+        headers: header,
+        success: function(data){
+            if(typeof data != 'object' || Object.keys(data).length != 2 || data[0] == '-1'){
+                $('#form-add').html('<h5 class="alert alert-warning text-center">You should choose academic year and semester</h5>');
+                return false;
+            }else{
+                $.ajax({
+                    url: "{{url('/api/academic_year')}}/"+data[0],
+                    method: 'get',
+                    headers: header,
+                    success: function(d){
+                        var academicTitle = d.data.title;
+                        var semesterTitle = d.data.semesters[0].id == data[1]? d.data.semesters[0].title : d.data.semesters[1].title;
+                        var content = '<p class="text-center"><span>Current Academic and Semester : </span><span>'+academicTitle+'</span><span>'+semesterTitle+'</span></p>';
+                        $('.academic-title').html(content);
+                    },
+                    error: function(xhr, status, message){
+                        showNavigator('<h6 class="text-center">Fail To Get Academic Year</h6>','error');
+                        console.log(xhr);
+                    },
+                });
+                getDataForm();
+            }
+        },
+        error: function(){
+            $('#form-add').html('<h5 class="alert alert-warning text-center">You should choose academic year and semester</h5>');
+        }
+    });
+    function getDataForm(){
+        $.ajax({
                 url: "{{route('teacher.index')}}?pre_page=-2",
                 method: 'get',
                 headers: header,
                 success: function(d){
                     teachers = d.data;
-                    console.log('teachers : ');
-                    console.log(teachers);
                     $.ajax({
                         url: "{{route('levels.courses')}}",
                         method: 'get',
                         headers: header,
                         beforeSend: function(){
-                            console.log('defore');
 
                         },
                         success: function(data, status, xhr){
                             var content = '';
 
-                            console.log(teachers);
                             if(Object.keys(data.data.data).length == 0)
                                 content = '<h5 class="alert alert-warning text-center">Empty Data !</h5>';
                             else{
@@ -147,12 +181,18 @@
                                     content += '<div class="another-input"><h3 class="input-title">'+level.title+'</h3><div class="row"><h3 class="col-sm-6 text-center">Course</h3><h3 class="col-sm-6 text-center">Teacher</h3></div><div class="form-body">';
                                     var courses = level.courses;
                                     if(Object.keys(courses).length == 0)
-                                        content += '<h5 class="alert alert-warning text-center">There no courses of this level</h5>';
+                                        content += '<h5 class="alert alert-warning text-center">There no courses to this level</h5>';
                                     $.each(courses, function(index, course){
-                                        content += '<div class="row"><div class="col-sm-6"><select name="course '+course.title+'" readonly  class="form-control"><option value="'+course.id+'" disable>'+course.title+'</option></select></div><div class="col-sm-6">';
-                                        content += '<select name="teacher '+course.id+'" class="operator form-control"><option value="0" disable>Select a Page...</option>';
+                                        content += '<div class="row"><div class="col-sm-6"><select readonly  class="form-control"><option value="'+course.id+'" disable>'+course.title+'</option></select></div><div class="col-sm-6">';
+                                        content += '<select name="teacher_'+course.id+'" class="teacher form-control"><option value="0" disable>Select a teacher ...</option>';
+                                        var courseTeacher = course.teachers;
                                         $.each(teachers, function(key, teacher){
-                                            content += '<option value="'+teacher.id+'">'+teacher.info.fullname+' --> '+teacher.titleJob+'</option>';
+                                            content += '<option value="'+teacher.id+'" ';
+                                            //for check if has aready reigster for teacher or new
+                                            if(Object.keys(courseTeacher).length >= 1 && courseTeacher[0].id == teacher.id){
+                                                content += 'selected ';
+                                            }
+                                            content += '>'+teacher.info.fullname+' --> '+teacher.titleJob+'</option>';
                                         });
                                         content += '</select>';
                                         content += '</div></div>';
@@ -162,8 +202,8 @@
                                 $('.form-body').html(content);
                             }
                         },
-                        error: function(xhr, status){
-                            console.log('level error');
+                        error: function(xhr, status, message){
+                            showNavigator('<h5 class="text-center">Fail to get courses</h5><p>- Error Message: '+message+'</p>','error');
                             console.log(xhr);
                         },
                     });
@@ -174,15 +214,13 @@
                 }
             });
 
+
+    }
     //console.log(compareDate('2020-02-20T22:40','2020-02-20T22:30')); // for test
     $('#form-add input[type=submit]').on('click',function(e){
-      var input = $('input');
+      var input = $('.teacher');
       var submit = true; //for check if validate input and check that is all right
-      $.each(input,function(key,value){
-        var field = $(this);
 
-        //console.log("Input name: "+$(this).prop('name')+" , value: "+$(this).val());  //for test
-      });
 
     $('.navigator .body ').on('click','.close', function(e){
         e.preventDefault();
@@ -194,17 +232,10 @@
       });
       if(submit){ // it will make requests to store new academi year
         //first store the academic year
-
-        var data = {
-            'title'               : $('input.academic-title').val(),
-            'semester1_title'     : $('input.semester1-title').val(),
-            'semester1_start_date': $('input.semester1-start').val(),
-            'semester1_end_date': $('input.semester1-end').val(),
-            'semester2_title'     : $('input.semester2-title').val(),
-            'semester2_start_date': $('input.semester2-start').val(),
-            'semester2_end_date': $('input.semester2-end').val(),
-
-        };
+        var d = {};
+        $.each(input,function(key,value){
+          d[$(this).prop('name')] = $(this).val();
+        });
         if(editForm)
           data['_method'] = 'PATCH';
         @if(isset($academic))
@@ -212,24 +243,24 @@
         @else
           var url = "{{route('academic_year.index')}}";
         @endif
-
+        console.log(d);
         $.ajax({
-          url: url,
+          url: "{{route('teacher.registerCourse')}}",
           method: 'POST',
           headers:header,
+          data:d,
           datatype: 'application/json',
-          data: data,
-          success: function(jsonData, status){
-            if(editForm)
-              var content = '<h6 class="text-center">Successfull Update Academic Year</h6>';
-            else
-              var content = '<h6 class="text-center">Successfull insert academic year</h6>';
+          success: function(jsonData, status, xhr){
+            var content = '<h6 class="text-center">Successfull register courses to teacher</h6>';
+            if(typeof jsonData != 'undefined')
+                content += '<p>- Description: '+jsonData+'</p>';
             showNavigator(content);
+            // console.log(jsonData);
+            // console.log(xhr);
             //to redirect to academic year list by default
-            window.location.replace("{{url('/admin/academic')}}");
+            //window.location.replace("{{url('/admin')}}");
           },
           error: function(xhr, status, message){ // this error of store academic year
-
             console.log(xhr);
             console.log(message);
             if(editForm)

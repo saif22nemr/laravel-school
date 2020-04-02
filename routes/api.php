@@ -28,7 +28,8 @@ Route::middleware(['auth:api'])->group(function(){
 
 	//Teacher
 
-	Route::resource('teacher','Teacher\TeacherController')->except(['create','edit']);
+    Route::resource('teacher','Teacher\TeacherController')->except(['create','edit']);
+    Route::post('teacher/register_course','Teacher\TeacherController@storeCourseToTeacher')->name('teacher.registerCourse');
 
 
 	//Student

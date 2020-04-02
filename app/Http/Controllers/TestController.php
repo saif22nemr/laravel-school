@@ -123,8 +123,18 @@ class TestController extends Controller
         //return $lastDestroy;
     }
     public function test(){
-        $date= date('Y-m-d');
-        return $date;
+        $semesterid = Setting::where('title','current_semester')->first()->value;
+        // $semesterid = 5;
+        if(!isset($semesterid) or !is_numeric($semesterid))
+            return $this->errorResponse('You should choose semester and academic year', 422);
+        $all = Level::with(['courses' => function( $query) use($semesterid){
+            $query->with(['teachers' => function($teacher) use($semesterid){
+                $teacher->whereHas('semesters', function($check) use($semesterid){
+                    $check->where('id',$semesterid);
+                });
+            }]);
+        }])->get();
+        return $all;
     }
     private function defineGroupUser(){
     	$users = User::all();
